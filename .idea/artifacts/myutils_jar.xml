@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="myutils:jar">
+    <output-path>C:/Public/lib/mylib</output-path>
+    <root id="archive" name="myutils.jar">
+      <element id="module-output" name="myutils" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src" />
+    </root>
+  </artifact>
+</component>
