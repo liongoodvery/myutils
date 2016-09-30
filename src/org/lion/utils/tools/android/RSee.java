@@ -37,7 +37,8 @@ public class RSee {
 
     private void replace(Path root) throws IOException {
         Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
-            @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 currentFile = file;
                 handleFile(file);
                 return super.visitFile(file, attrs);
@@ -58,7 +59,7 @@ public class RSee {
 
 
     String outFormat = "file=%s,lineNo=%s,%s =====> %s";
-    String eFormat   = "=============file=%s,lineNo=%s,%s";
+    String eFormat = "=============file=%s,lineNo=%s,%s";
 
     private String handleLine(String line) {
         String str = line;
@@ -87,7 +88,7 @@ public class RSee {
                             currentFile.toAbsolutePath(),
                             lineNo,
                             line
-                                                    ));
+                    ));
                     e.printStackTrace();
                 }
             }
