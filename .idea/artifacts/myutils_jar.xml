@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$/../../../share/public/lib/jars</output-path>
     <root id="archive" name="myutils.jar">
       <element id="module-output" name="myutils" />
-      <element id="dir-copy" path="$PROJECT_DIR$/src" />
     </root>
   </artifact>
 </component>
