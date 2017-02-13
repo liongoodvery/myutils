@@ -1,57 +1,91 @@
 package org.lion.utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Base64;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Created by lion on 2/11/17.
  */
 public class PingCheck {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    static final int threadNum = 10;
+    static final int timeout = 200;
+    static final String host;
+    static final String port;
+    static final String path;
+
+    static {
+        host = ResourceBundle.getBundle("ping").getString("host");
+        port = ResourceBundle.getBundle("ping").getString("port");
+        path = ResourceBundle.getBundle("ping").getString("path");
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException, TimeoutException, ExecutionException {
         String prefix = "192.168.1.";
-        final int threadNum=10;
-        final int timeout=200;
-        Set<Integer> set = new ConcurrentSkipListSet<>();
-        ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
+        Set<Integer> set = new TreeSet<>();
+        List<Future<Boolean>> futures = new ArrayList<>();
+        ExecutorService service = Executors.newFixedThreadPool(threadNum);
         for (int i = 0; i < 255; ++i) {
-            int finalI = i;
-            executorService.execute(() -> {
-                InetAddress ip = null;
-                try {
-                    ip = InetAddress.getByName(prefix + finalI);
-                    boolean reachable = ip.isReachable(timeout);
-                    if (reachable) {
-                        set.add(finalI);
-                    }
-                } catch (IOException e) {
-                }
-            });
+            futures.add(service.submit(new Worker(prefix, i + "")));
         }
-        executorService.shutdown();
-        executorService.awaitTermination(255*timeout/ threadNum*2, TimeUnit.MILLISECONDS);
-
-
-        StringBuilder sb = new StringBuilder();
-        for (Integer integer : set) {
-            sb.append(integer).append("-");
-        }
-        String ips = "";
-        if (sb.length() > 1) {
-            ips = sb.toString();
-            ips = ips.substring(0, ips.length() - 1);
+        service.shutdown();
+        service.awaitTermination(255 * timeout / threadNum * 2, TimeUnit.MILLISECONDS);
+        for (int i = 0; i < futures.size(); i++) {
+            Future<Boolean> future = futures.get(i);
+            if (future.get(1, TimeUnit.MINUTES)) {
+                set.add(i);
+            }
         }
 
-        byte[] encode = Base64.getEncoder().encode(ips.getBytes());
-        String urlparam = URLEncoder.encode(new String(encode));
-        new URL("http://localhost:10998/api/ping?ips=" + urlparam).openConnection().getInputStream();
 
+        String parent = new String(Base64.getEncoder().encode(prefix.getBytes()));
+        String children = "";
+        if (set.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (Integer integer : set) {
+                sb.append(integer).append("\u0000");
+            }
+            System.out.println(sb.toString().replaceAll("\\u0000", "-"));
+            String ips = "";
+            if (sb.length() > 1) {
+                ips = sb.toString();
+                ips = ips.substring(0, ips.length() - 1);
+            }
+            children = new String(Base64.getEncoder().encode(ips.getBytes()));
+        }
+
+
+        InputStream inputStream = new URL(String.format("http://%s:%s/%s/api/report/host?parent=%s&children=%s", host, port, path, parent, children)).openConnection().getInputStream();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        System.out.println(reader.readLine());
+    }
+
+
+    public static class Worker implements Callable<Boolean> {
+        private String prefix;
+        private String order;
+
+        public Worker(String prefix, String order) {
+            this.prefix = prefix;
+            this.order = order;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            InetAddress ip = null;
+            try {
+                ip = InetAddress.getByName(prefix + order);
+                return ip.isReachable(timeout);
+            } catch (IOException e) {
+            }
+            return false;
+        }
     }
 }
+

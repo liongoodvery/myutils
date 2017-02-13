@@ -14,10 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -160,5 +157,11 @@ public class NewTest {
             }
             Commons.log(str);
         }
+    }
+
+    @Test
+    public void test165() throws Exception {
+        System.out.println(UUID.randomUUID());
+
     }
 }
