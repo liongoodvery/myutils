@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +29,63 @@ public class VariableToString {
         int startLine = Integer.parseInt(args[1]);
         int endLine = Integer.parseInt(args[2]);
 
-        List<String> lines = Files.readAllLines(sourceFile,Charset.forName("UTF-8") );
+        List<String> lines = Files.readAllLines(sourceFile, Charset.forName("UTF-8"));
         List<String> vars = new ArrayList<>();
         getVars(startLine, endLine, lines, vars);
+
+        String option = "";
+        if (args.length == 4) {
+            String sdk = args[3];
+            if (sdk.toLowerCase().contains("android")) {
+                option = "android";
+            }
+        }
+        if (sourceFile.toString().endsWith(".js") || sourceFile.toString().endsWith(".html")) {
+            option = "js";
+        }
+        StringBuilder sb = null;
+        if ("js".equals(option)) {
+            sb = parseJs(vars, option);
+
+        } else {
+            sb = parseJava(vars, option);
+        }
+
+
+        int lineNo = startLine - 1;
+        while (lineNo < endLine && "".equals(lines.get(lineNo).trim())) {
+            ++lineNo;
+        }
+
+        String s = lines.get(lineNo);
+
+        int space = 0;
+        while (space < s.length() && s.charAt(space) == ' ') {
+            space++;
+            sb.insert(0, " ");
+        }
+        lines.add(endLine, sb.toString());
+        Files.write(sourceFile, lines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+    }
+
+    private static StringBuilder parseJs(List<String> vars, String option) {
+        System.out.println("VariableToString.parseJs");
+        StringBuilder sb = new StringBuilder();
+        sb.append("console.log(");
+        for (String var : vars) {
+            sb.append("'").append(var).append("=' + ").append(var).append(", ");
+        }
+        if (sb.length() > 2) {
+            sb.deleteCharAt(sb.length() - 1);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        sb.append(");");
+        System.out.println(sb);
+        return sb;
+    }
+
+    private static StringBuilder parseJava(List<String> vars, String option) {
+        System.out.println("VariableToString.parseJava");
         StringBuilder sb_format = new StringBuilder();
         StringBuilder sb_argument = new StringBuilder();
         sb_format.append("\"");
@@ -39,29 +94,29 @@ public class VariableToString {
             sb_argument.append(",").append(var);
         }
         sb_format.append("\\n\"");
-
-        String out = getOut(args);
+        String out = getOut(option);
 
         StringBuilder sb = new StringBuilder();
         sb.append(out)
-          .append("String.format(")
-          .append(sb_format)
-          .append(sb_argument)
-          .append(")")
-          .append(");");
+                .append("String.format(")
+                .append(sb_format)
+                .append(sb_argument)
+                .append(")")
+                .append(");");
         System.out.println(sb);
-
-
+        return sb;
     }
 
-    private static String getOut(String[] args) {
-        if (args.length == 4) {
-            String sdk = args[3];
-            if (sdk.toLowerCase().contains("android")) {
+    private static String getOut(String option) {
+        switch (option.toLowerCase()) {
+            case "android":
                 return "Log.i(TAG, ";
-            }
+            case "js":
+                return "console.log(";
+            default:
+                return "System.out.print(";
         }
-        return "System.out.print(";
+
     }
 
     private static void getVars(int startLine, int endLine, List<String> lines, List<String> vars) {

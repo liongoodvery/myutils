@@ -70,7 +70,7 @@ public class Commons {
             TimeUnit.SECONDS.sleep(time);
             if (isPrint) {
                 Commons.log("TIME=%-15s , NAME=%-10s , SLEEP=%-5d\n",
-                            getTimeString(), Thread.currentThread().getName(), time);
+                        getTimeString(), Thread.currentThread().getName(), time);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class Commons {
         long st = (long) (Math.random() * maxSec);
         if (isPrint) {
             Commons.log("TIME=%-15s , NAME=%-10s , SLEEP=%-5d\n",
-                        getTimeString(), Thread.currentThread().getName(), st);
+                    getTimeString(), Thread.currentThread().getName(), st);
         }
         TimeUnit.SECONDS.sleep(st);
     }
@@ -193,7 +193,7 @@ public class Commons {
      */
     public static void threadStartLog(String extra) {
         Commons.log("Thread %s Starts %s\n", Thread.currentThread().getName(),
-                    extra);
+                extra);
     }
 
     /**
@@ -210,7 +210,7 @@ public class Commons {
      */
     public static void threadEndLog(String extra) {
         Commons.log("Thread %s Ends %s\n", Thread.currentThread().getName(),
-                    extra);
+                extra);
     }
 
     /**
@@ -563,7 +563,7 @@ public class Commons {
 
         } catch (IOException e) {
             Commons.log("=======Convert file %s failed e.message=%s\n", file.toAbsolutePath()
-                                                                            .toString(), e.getMessage());
+                    .toString(), e.getMessage());
         }
     }
 
@@ -685,7 +685,7 @@ public class Commons {
                     Object first = pair.getFirst();
                     Object second = pair.getSecond();
                     if (first.getClass()
-                             .equals(second.getClass()) && first instanceof Comparable && second instanceof Comparable) {
+                            .equals(second.getClass()) && first instanceof Comparable && second instanceof Comparable) {
                         Comparable c1 = (Comparable) first;
                         Comparable c2 = (Comparable) second;
                         if (c1.compareTo(c2) < 0) {
@@ -738,17 +738,16 @@ public class Commons {
     }
 
     public static void zip(File sorceFile, File targetFile) throws IOException {
-        FileInputStream    fin = new FileInputStream(sorceFile);
-        GZIPOutputStream    fout = new GZIPOutputStream(new FileOutputStream(targetFile));
-        IOStreams.copy(fin,fout);
+        FileInputStream fin = new FileInputStream(sorceFile);
+        GZIPOutputStream fout = new GZIPOutputStream(new FileOutputStream(targetFile));
+        IOStreams.copy(fin, fout);
     }
 
     public static void unZip(File sorceFile, File targetFile) throws IOException {
-        GZIPInputStream   fin = new GZIPInputStream(new FileInputStream(sorceFile));
-        FileOutputStream  fout = new FileOutputStream(targetFile);
-       IOStreams.copy(fin,fout);
+        GZIPInputStream fin = new GZIPInputStream(new FileInputStream(sorceFile));
+        FileOutputStream fout = new FileOutputStream(targetFile);
+        IOStreams.copy(fin, fout);
     }
-
 
 
     public static Map<Integer, String> parseR(Path rPath) throws IOException {
@@ -771,10 +770,44 @@ public class Commons {
                 int length = split.length;
                 String s = split[length - 1];
                 R.put(Integer.parseInt(s.substring(0, s.length() - 1)),
-                      String.format(format, className, split[length - 3]));
+                        String.format(format, className, split[length - 3]));
             }
         }
         return R;
     }
 
+    public static String parseSqlInsertFormat(String tableName, int columnCount) {
+        if (Strings.isNullOrEmpty(tableName)) {
+            throw new RuntimeException("table name could not be empty");
+        }
+
+        if (columnCount < 1) {
+            throw new RuntimeException("columnCount must >=1");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("insert into ").append(tableName)
+                .append(" (");
+        for (int i = 0; i < columnCount-1; i++) {
+            sb.append("%s,");
+        }
+        sb.append("%s) values (");
+        for (int i = 0; i < columnCount-1; i++) {
+            sb.append("'%%s',");
+        }
+        sb.append("'%%s');");
+        return sb.toString();
+    }
+
+
+    public static String parseSqlInsertFormat(String tableName, String[] colums) {
+        if (Strings.isNullOrEmpty(tableName)) {
+            throw new RuntimeException("table name could not be empty");
+        }
+        if (colums == null || colums.length < 1) {
+            throw new RuntimeException("length of columns must >=1");
+        }
+        String format = parseSqlInsertFormat(tableName, colums.length);
+        return String.format(format, colums);
+    }
 }
