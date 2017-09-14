@@ -27,7 +27,15 @@ public class UrlFetcher {
         this.mInPath = inPath;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
+        try {
+            run(args);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run(String[] args) throws IOException {
         Path inPath = Paths.get("z:/Bookmarks.html");
         Path outPath = Paths.get("z:/bookmark_host");
         if (args.length >= 1) {

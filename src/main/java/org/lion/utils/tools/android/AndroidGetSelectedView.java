@@ -2,6 +2,7 @@ package org.lion.utils.tools.android;
 
 import org.lion.utils.Strings;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,13 +16,12 @@ import java.util.Map;
  * The class generate code for selected line of a android activity source file.
  */
 public class AndroidGetSelectedView {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length < 3) {
             for (String arg : args) {
                 System.out.println(arg);
             }
             System.out.flush();
-            Thread.sleep(200);
             throw new RuntimeException("Usage java AndroidGetSelectedView source startLine endLine [Optional]");
         }
 
@@ -29,17 +29,23 @@ public class AndroidGetSelectedView {
         int startLine = Integer.parseInt(args[1]);
         int endLine = Integer.parseInt(args[2]);
 
-        List<String> lines = Files.readAllLines(sourceFile, Charset.forName("UTF-8"));
-        Map<String, String> vars = new LinkedHashMap<>();
-        getVars(startLine, endLine, lines, vars);
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(sourceFile, Charset.forName("UTF-8"));
+            Map<String, String> vars = new LinkedHashMap<>();
+            getVars(startLine, endLine, lines, vars);
 //        System.out.println(vars);
 
 
-        for (Map.Entry<String, String> entry : vars.entrySet()) {
-            System.out.printf("%s=(%s)findViewById(R.id.%s);\n",
-                              entry.getKey(), entry.getValue(),
-                              entry.getKey());
+            for (Map.Entry<String, String> entry : vars.entrySet()) {
+                System.out.printf("%s=(%s)findViewById(R.id.%s);\n",
+                        entry.getKey(), entry.getValue(),
+                        entry.getKey());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     /*

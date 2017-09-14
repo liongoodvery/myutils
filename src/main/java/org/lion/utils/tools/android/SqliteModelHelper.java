@@ -3,6 +3,7 @@ package org.lion.utils.tools.android;
 
 import org.lion.utils.Strings;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,15 +16,22 @@ import java.util.List;
  * Helper to phase sqlite imformation of a model
  */
 public class SqliteModelHelper {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length != 3) {
             for (String arg : args) {
                 System.out.println(arg);
             }
-            Thread.sleep(200);
             throw new RuntimeException("Usage java SqliteModelHelper filePath startLine endLine");
         }
 
+        try {
+            run(args);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run(String[] args) throws IOException {
         Path path = Paths.get(args[0]);
         int startLine = Integer.parseInt(args[1]);
         int endLine = Integer.parseInt(args[2]);

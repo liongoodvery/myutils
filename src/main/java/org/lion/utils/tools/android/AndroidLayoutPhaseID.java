@@ -2,6 +2,7 @@ package org.lion.utils.tools.android;
 
 import org.lion.utils.Strings;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,16 +17,24 @@ import java.util.Map;
  */
 public class AndroidLayoutPhaseID {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)  {
         if (args.length != 1) {
             for (String arg : args) {
                 System.out.println(arg);
             }
-            Thread.sleep(200);
             throw new RuntimeException("Usage java AndroidLayoutPhaseID filePath");
 
         }
-        Path source = Paths.get(args[0]);
+        try {
+            run(args[0]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void run(String arg) throws IOException {
+        Path source = Paths.get(arg);
         List<String> lines = Files.readAllLines(source, Charset.forName("UTF-8"));
         Map<String, String> vars = new LinkedHashMap<>();
 
@@ -85,7 +94,6 @@ public class AndroidLayoutPhaseID {
                        .append("\nreturn convertView;\n");
             System.out.println(sb_get_view);
         }
-
     }
 
     private static String nameDroid(String str) {

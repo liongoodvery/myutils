@@ -15,7 +15,15 @@ import java.util.Date;
  * See the script e:/bin/iproc/ntuser_backup.bat
  */
 public class NtUserBackup {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
+        try {
+            run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run() throws IOException {
         String root = "C:\\Users\\more";
         String fileName = "NTUSER.zip";
         Path source = Paths.get(root, fileName);

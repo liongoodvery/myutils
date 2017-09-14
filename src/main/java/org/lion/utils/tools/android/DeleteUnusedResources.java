@@ -16,10 +16,18 @@ public class DeleteUnusedResources {
     public static final String prefix = "E:\\worktrans\\yjyx-android-teacher\\yjyx\\src\\main\\res\\";
     public static String[] dirFilters = {prefix + "anim", prefix + "drawable", prefix + "mipmap", prefix + "layout"};
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
 //        if (args.length !=1){
 //            throw new IllegalArgumentException("Usage DeleteUnusedResources fileListName");
 //        }
+        try {
+            run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run() throws IOException {
         Path delListFile = Paths.get("f:/UnusedResources.txt");
         List<String> allLines = Files.readAllLines(delListFile, Charset.forName("UTF-8"));
         Collections.sort(allLines);

@@ -15,7 +15,15 @@ import java.util.List;
  * Created by lion on 9/30/16.
  */
 public class ReplaceRClass {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
+        try {
+            run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run() throws IOException {
         Files.walkFileTree(Paths.get("/home/lion/work/worktrans/yjyx-android-teacher/yjyx/src/main/java/"),new SimpleFileVisitor<Path>(){
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

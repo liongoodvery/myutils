@@ -15,8 +15,16 @@ import java.util.List;
  * Given format below the last line.
  */
 public class VariableToString {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
+        try {
+            run(args);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run(String[] args) throws IOException {
         if (args.length < 4) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println(args[i]);

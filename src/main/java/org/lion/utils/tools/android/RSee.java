@@ -19,8 +19,12 @@ public class RSee {
     public Map<Integer, String> R = new HashMap<>();
 
 
-    public static void main(String[] args) throws IOException {
-        new RSee().parse(args);
+    public static void main(String[] args)  {
+        try {
+            new RSee().parse(args);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void parse(String[] args) throws IOException {

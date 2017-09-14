@@ -13,7 +13,15 @@ public class WriteMdCode {
 
     private static List<String> lines;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
+        try {
+            run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run() throws IOException {
         String pwd = System.getProperty("user.dir");
         System.out.println(">>>>>pwd= "+ pwd);
         String tmp = System.getenv("tmp");

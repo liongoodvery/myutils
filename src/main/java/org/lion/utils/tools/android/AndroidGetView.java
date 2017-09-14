@@ -2,7 +2,9 @@ package org.lion.utils.tools.android;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,17 +13,24 @@ import java.util.List;
  * The Program init the Android view
  */
 public class AndroidGetView {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         //accept only one argument , the source file full path.
         if (args.length != 1) {
             for (String arg : args) {
                 System.out.println(arg);
             }
-            Thread.sleep(200);
             throw new RuntimeException("Usage java AndroidGetView filePath ");
         }
         Path source = Paths.get(args[0]);
-        List<String> lines = Files.readAllLines(source,Charset.forName("UTF-8") );
+        try {
+            run(source);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run(Path source) throws IOException {
+        List<String> lines = Files.readAllLines(source, Charset.forName("UTF-8"));
         //the line include android views
         List<String[]> views = new ArrayList<>();
         // the number line the activity started
@@ -55,25 +64,7 @@ public class AndroidGetView {
         for (String line : writtenLines) {
             System.out.println(line);
         }
-
-//        Files.copy(source,
-//                   Paths.get("z:/tmp", String.format("%s-%d", source.toFile().getName(), System.currentTimeMillis()))
-//                , StandardCopyOption.REPLACE_EXISTING);
-//        Path outFile = Paths.get(args[0]);
-//
-//        writeFile(outFile, lines.subList(0, breadLineNumber + 1), false);
-//        writeFile(outFile, writtenLines, true);
-//        writeFile(outFile, lines.subList(breadLineNumber + 1, lines.size()), true);
-//
-//        System.out.printf("write %s lines\n", writtenLines.size());
-//        System.in.read();
-
     }
 
-//    private static void writeFile(Path out, Iterable<String> lines, boolean append) throws IOException {
-//        Files.write(out, lines,
-//                    Charset.defaultCharset(),
-//                    append ? StandardOpenOption.APPEND : StandardOpenOption.TRUNCATE_EXISTING);
-//    }
 
 }

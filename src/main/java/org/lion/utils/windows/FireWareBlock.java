@@ -22,13 +22,21 @@ public class FireWareBlock {
     static Path outFile = Paths.get("outabc.ps");
 
     static String outFormat  ="//    New-NetFirewallRule -DisplayName \"nvSCPAPISvr.exe_12269b12\" -Direction Outbound -Program \"\" -Action Block -Enabled True -Group \"%s\"\n";
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
         if (args.length > 0) {
             for (String arg : args) {
                 scanFiles.add(arg);
             }
         }
 
+        try {
+            run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void run() throws IOException {
         for (String scanFile : scanFiles) {
 
             Path path = Paths.get(scanFile);

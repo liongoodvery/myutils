@@ -22,9 +22,13 @@ public class ProxyMethodLogger extends ProxyLogger
      * @param args the first argument is the file to be handled,the second argument is some information
      *             to determine the runtime environment.
      */
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
-        new ProxyMethodLogger(args).log();
+        try {
+            new ProxyMethodLogger(args).log();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
