@@ -14,6 +14,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -788,11 +790,11 @@ public class Commons {
         StringBuilder sb = new StringBuilder();
         sb.append("insert into ").append(tableName)
                 .append(" (");
-        for (int i = 0; i < columnCount-1; i++) {
+        for (int i = 0; i < columnCount - 1; i++) {
             sb.append("%s,");
         }
         sb.append("%s) values (");
-        for (int i = 0; i < columnCount-1; i++) {
+        for (int i = 0; i < columnCount - 1; i++) {
             sb.append("'%%s',");
         }
         sb.append("'%%s');");
@@ -809,5 +811,36 @@ public class Commons {
         }
         String format = parseSqlInsertFormat(tableName, colums.length);
         return String.format(format, colums);
+    }
+
+
+    /**
+     * @param id like "@+id/timepicker"
+     * @return like "timepicker"
+     */
+    public static String splitAndroidId(String id) {
+        return Strings.lastPart(id, "/");
+    }
+
+    /**
+     *
+     * @param className
+     * @return org.lion.utils.Commons=>Commons
+     */
+    public static String simpleClassName(String className) {
+        return Strings.lastPart(className, ".");
+    }
+
+    public static String fileNameWithoutExt(String file) {
+        if (Strings.isEmpty(file)) {
+            return "";
+        }
+        String s = Strings.lastPart(file, File.separator);
+        Pattern pattern = Pattern.compile("(.*)\\..*");
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return s;
     }
 }
