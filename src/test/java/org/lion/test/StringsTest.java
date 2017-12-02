@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.lion.utils.Strings;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by lion on 17-9-15.
  */
@@ -26,6 +29,7 @@ public class StringsTest {
         Assert.assertEquals("mAbcDef", Strings.underLineToCamel("m", "abc_def"));
         Assert.assertEquals("abcDef", Strings.underLineToCamel("", "abc_def"));
         Assert.assertEquals("abcDef", Strings.underLineToCamel(null, "abc_def"));
+        Assert.assertEquals("AbcDef", Strings.underLineToCamel(null, "abc_def", false));
     }
 
     @Test
@@ -34,6 +38,27 @@ public class StringsTest {
         Assert.assertTrue(Strings.isEmpty(""));
         Assert.assertTrue(!Strings.isEmpty("a"));
 
+
+    }
+
+    @Test
+    public void testJoin() throws Exception {
+        final List<Integer> emptyList = new ArrayList<>();
+        final List<Integer> fiveElem = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            fiveElem.add(i);
+        }
+        Assert.assertEquals("null", Strings.join(null, null, null, null));
+        Assert.assertEquals("", Strings.join(emptyList, null, null, null));
+        Assert.assertEquals("", Strings.join(emptyList, "", null, null));
+        Assert.assertEquals("(", Strings.join(emptyList, "", "(", null));
+        Assert.assertEquals("()", Strings.join(emptyList, "", "(", ")"));
+        Assert.assertEquals("((]]", Strings.join(emptyList, "", "((", "]]"));
+        Assert.assertEquals("((]]", Strings.join(emptyList, "-", "((", "]]"));
+        Assert.assertEquals("01234", Strings.join(fiveElem, null, null, null));
+        Assert.assertEquals("0,1,2,3,4", Strings.join(fiveElem, ",", null, null));
+        Assert.assertEquals("0,,1,,2,,3,,4", Strings.join(fiveElem, ",,", null, null));
+        Assert.assertEquals("[[0,,1,,2,,3,,4", Strings.join(fiveElem, ",,", "[[", null));
 
     }
 }

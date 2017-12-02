@@ -1,5 +1,7 @@
 package org.lion.utils;
 
+import java.util.Collection;
+
 /**
  * Created by more on 2016-05-08 10:31:26.
  * Some tools of string
@@ -62,6 +64,10 @@ public class Strings {
     }
 
     public static String underLineToCamel(String prefix, String str) {
+        return underLineToCamel(prefix, str, true);
+    }
+
+    public static String underLineToCamel(String prefix, String str, boolean lowerFirst) {
         if (isEmpty(str)) {
             return "";
         }
@@ -73,9 +79,11 @@ public class Strings {
         }
 
         if (isEmpty(prefix)) {
-            String s = sb.substring(0, 1);
-            sb.replace(0, 1, s.toLowerCase());
-        }else {
+            if (lowerFirst) {
+                String s = sb.substring(0, 1);
+                sb.replace(0, 1, s.toLowerCase());
+            }
+        } else {
             sb.insert(0, prefix);
         }
 
@@ -92,5 +100,32 @@ public class Strings {
 
     public static boolean isNullOrEmpty(CharSequence cs) {
         return null == cs || cs.length() == 0;
+    }
+
+    public static String join(Collection collection, String spliter, String start, String end) {
+        if (collection == null) {
+            return "null";
+        }
+        StringBuilder sb = new StringBuilder();
+
+        if (null != start) {
+            sb.append(start);
+        }
+
+        for (Object item : collection) {
+            sb.append(item);
+            if (null != spliter) {
+                sb.append(spliter);
+            }
+        }
+
+        if (collection.size() > 0 && null != spliter) {
+            sb.delete(sb.length() - spliter.length(), sb.length());
+        }
+
+        if (null != end) {
+            sb.append(end);
+        }
+        return sb.toString();
     }
 }
