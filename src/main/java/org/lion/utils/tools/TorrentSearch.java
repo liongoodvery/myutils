@@ -21,7 +21,7 @@ public class TorrentSearch {
 
     public static void main(String[] args) {
         new Getopt(TorrentSearch.class.getSimpleName(), args,"");
-        for (int i = 7; i < 17; i++) {
+        for (int i = 18; i < 28; i++) {
             download("痴女", i);
         }
         try {

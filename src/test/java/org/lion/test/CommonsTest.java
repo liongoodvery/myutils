@@ -141,11 +141,11 @@ public class CommonsTest {
 
     @Test
     public void test142() throws Exception {
-        Optional<String> first = List.of("111")
-                .stream()
-                .filter(s -> s.length() % 2 == 0)
-                .findFirst();
-        System.out.println(first.orElse("nothing"));
+//        Optional<String> first = List.of("111")
+//                .stream()
+//                .filter(s -> s.length() % 2 == 0)
+//                .findFirst();
+//        System.out.println(first.orElse("nothing"));
     }
 
     @Test
