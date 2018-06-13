@@ -10,7 +10,7 @@ import java.util.UUID;
  * Created by lion on 17-6-14.
  */
 public class FileWalker {
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
         try {
             run();
         } catch (IOException e) {
@@ -20,9 +20,9 @@ public class FileWalker {
     }
 
     private static void run() throws IOException {
-        Path startPoint = Paths.get("/media/lion/HEAP/android2.3");
-        Path out = Paths.get("/home/lion/dir_file2.3");
-        Path sql = Paths.get("/home/lion/dir_file2.3.sql");
+        Path startPoint = Paths.get("/mnt/heap/android/aosp");
+        Path out = Paths.get("/home/lion/data/dir_file2");
+        Path sql = Paths.get("/home/lion/data/dir_file2.sql");
 
         ArrayList<String> lines = new ArrayList<>();
         ArrayList<String> sqlLines = new ArrayList<>();
@@ -43,7 +43,11 @@ public class FileWalker {
 
                 Path relativize = startPoint.relativize(file);
                 String pathName = relativize.toString();
-                if (pathName.contains(".repo") || pathName.contains(".git")) {
+                if (pathName.startsWith(".") ||
+                        pathName.startsWith("prebuilts/") ||
+                        pathName.contains(".repo") ||
+                        pathName.contains(".git") ||
+                        pathName.startsWith("out/")) {
 
                 } else {
                     lines.add(pathName);

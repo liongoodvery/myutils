@@ -11,16 +11,21 @@ import java.util.List;
  */
 public class AndroidTagParserFactory {
     enum TagType {
-        Activity, Fragment, Adapter
+        Activity, Fragment, Adapter, Dialog, COMMON
     }
 
-    public static AndroidTagParser getParse(TagType tagType) {
-
+    public static AndroidTagParser getParse(TagType tagType, boolean userCommonParser) {
+        if (userCommonParser) {
+            return new CommonAndroidTagParser(tagType);
+        }
         if (tagType == TagType.Fragment) {
             return new FragmentAndroidTagParser();
         }
         if (tagType == TagType.Adapter) {
             return new AdapterAndroidTagParser();
+        }
+        if (tagType == TagType.Dialog) {
+            return new DialogAndroidTagParser();
         }
 
         return new ActivityAndroidTagParser();
@@ -90,6 +95,23 @@ class FragmentAndroidTagParser extends AbsAndroidTagParser {
 }
 
 
+class DialogAndroidTagParser extends AbsAndroidTagParser {
+    public static final String DECLATATION_FORMAT = "private %s %s;";
+    public static final String ASSIGNMENT_FORMAT = "%s = (%s)mDialog.findViewById(R.id.%s);";
+
+    @Override
+    protected String getAssignment(AndroidTag androidTag) {
+        return String.format(ASSIGNMENT_FORMAT, getVarName(androidTag.getId()),
+                androidTag.getName(),
+                androidTag.getId());
+    }
+
+    @Override
+    protected String getDeclaration(AndroidTag androidTag) {
+        return String.format(DECLATATION_FORMAT, androidTag.getName(), getVarName(androidTag.getId()));
+    }
+}
+
 class AdapterAndroidTagParser extends AbsAndroidTagParser {
     public static final String DECLATATION_FORMAT = "public %s %s;";
     public static final String ASSIGNMENT_FORMAT = "%s = (%s)itemView.findViewById(R.id.%s);";
@@ -106,3 +128,39 @@ class AdapterAndroidTagParser extends AbsAndroidTagParser {
         return String.format(DECLATATION_FORMAT, androidTag.getName(), getVarName(androidTag.getId()));
     }
 }
+
+
+class CommonAndroidTagParser extends AbsAndroidTagParser {
+    public static final String DECLATATION_FORMAT = "%s %s = %sfindViewById(R.id.%s);";
+    public static final String ASSIGNMENT_FORMAT = "%s = (%s)itemView.findViewById(R.id.%s);";
+    private final AndroidTagParserFactory.TagType tagType;
+    private String prefix;
+
+    CommonAndroidTagParser(AndroidTagParserFactory.TagType tagType) {
+        this.tagType = tagType;
+        prefix = "";
+        if (tagType == AndroidTagParserFactory.TagType.Adapter) {
+            prefix = "itemView.";
+        }
+
+        if (tagType == AndroidTagParserFactory.TagType.Dialog) {
+            prefix = "mDialog.";
+        }
+    }
+
+    @Override
+    protected String getAssignment(AndroidTag androidTag) {
+        return "";
+    }
+
+    @Override
+    protected String getDeclaration(AndroidTag androidTag) {
+
+        return String.format(DECLATATION_FORMAT,
+                androidTag.getName(),
+                Strings.underLineToCamel("", androidTag.getId()),
+                prefix,
+                androidTag.getId());
+    }
+}
+

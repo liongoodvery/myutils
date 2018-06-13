@@ -21,8 +21,8 @@ public class TorrentSearch {
 
     public static void main(String[] args) {
         new Getopt(TorrentSearch.class.getSimpleName(), args,"");
-        for (int i = 18; i < 28; i++) {
-            download("痴女", i);
+        for (int i = 0; i < 10; i++) {
+            download("第一會所新片", i);
         }
         try {
             Files.write(Paths.get("/tmp/abc.html"), LINES);

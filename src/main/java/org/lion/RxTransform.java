@@ -26,25 +26,28 @@ public class RxTransform {
         try {
             List<String> list = Files.readAllLines(path).stream()
                     .map(s -> {
-                        if ("import rx.android.schedulers.AndroidSchedulers;".equals(s)) {
-                            return "import io.reactivex.android.schedulers.AndroidSchedulers;";
-                        }
-
-                        if ("import rx.schedulers.Schedulers;".equals(s)) {
-                            return "import io.reactivex.schedulers.Schedulers;";
-                        }
-
-                        if ("import rx.Observable;".equals(s)) {
-                            return "import io.reactivex.Observable;";
-                        }
-                        if ("import rx.Subscriber;".equals(s)) {
-                            return "import edu.yjyx.student.utils.Subscriber;";
-                        }
-                        if ("import edu.yjyx.library.model.StatusCode;".equals(s)) {
-                            return "import edu.yjyx.main.model.StatusCode;";
-                        }
-                        if ("import rx.Observer;".equals(s)) {
-                            return "import io.reactivex.Observer;";
+//                        if ("import rx.android.schedulers.AndroidSchedulers;".equals(s)) {
+//                            return "import io.reactivex.android.schedulers.AndroidSchedulers;";
+//                        }
+//
+//                        if ("import rx.schedulers.Schedulers;".equals(s)) {
+//                            return "import io.reactivex.schedulers.Schedulers;";
+//                        }
+//
+//                        if ("import rx.Observable;".equals(s)) {
+//                            return "import io.reactivex.Observable;";
+//                        }
+//                        if ("import rx.Subscriber;".equals(s)) {
+//                            return "import edu.yjyx.student.utils.Subscriber;";
+//                        }
+//                        if ("import edu.yjyx.library.model.StatusCode;".equals(s)) {
+//                            return "import edu.yjyx.main.model.StatusCode;";
+//                        }
+//                        if ("import rx.Observer;".equals(s)) {
+//                            return "import io.reactivex.Observer;";
+//                        }
+                        if (s.startsWith("public class") && s.contains("BaseActivityV2")) {
+                            return s.replace("BaseActivityV2", "BaseActivity");
                         }
                         return s;
                     }).collect(Collectors.toList());

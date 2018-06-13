@@ -40,6 +40,7 @@ public class AndroidLayoutPhaseID {
     }
 
     public void start(String fileName) {
+        boolean userCommonParser = "1".equals(System.getProperty("userCommonParser"));
         boolean isJava = false;
         TagType type = TagType.Activity;
         if (fileName.endsWith("java")) {
@@ -64,20 +65,25 @@ public class AndroidLayoutPhaseID {
                 String file = fileNames.remove(0);
                 handleFile(reader, file);
             }
-            AndroidTagParser parse = AndroidTagParserFactory.getParse(type);
+            AndroidTagParser parse = AndroidTagParserFactory.getParse(type,userCommonParser);
+
             TagResult tagResult = parse.parse(androidTags);
             System.out.println();
             System.out.println("//view declarations starts");
             List<String> declarations = tagResult.getDeclarations();
             for (String declaration : declarations) {
-                System.out.println(declaration);
+                if (!"".equals(declaration)) {
+                    System.out.println(declaration);
+                }
             }
             System.out.println("//view declarations ends\n");
 
             System.out.println("//view assignments starts");
             List<String> assignments = tagResult.getAssignments();
             for (String assignment : assignments) {
-                System.out.println(assignment);
+                if (!"".equals(assignment)) {
+                    System.out.println(assignment);
+                }
             }
             System.out.println("//view assignments ends\n");
 
@@ -147,6 +153,9 @@ public class AndroidLayoutPhaseID {
         if (name.toLowerCase().endsWith("adapter")) {
             return TagType.Adapter;
         }
+        if (name.toLowerCase().endsWith("dialogfragment")) {
+            return TagType.Dialog;
+        }
         return TagType.Activity;
     }
 
@@ -160,6 +169,10 @@ public class AndroidLayoutPhaseID {
         }
         if (name.toLowerCase().startsWith("item")) {
             return TagType.Adapter;
+        }
+
+        if (name.toLowerCase().startsWith("dialog")) {
+            return TagType.Dialog;
         }
         return TagType.Activity;
     }

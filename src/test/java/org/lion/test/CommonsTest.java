@@ -1,6 +1,9 @@
 package org.lion.test;
 
+import io.reactivex.Observable;
+import io.reactivex.observables.ConnectableObservable;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.lion.beans.Person;
 import org.lion.utils.Commons;
@@ -18,6 +21,9 @@ import java.util.stream.Stream;
  * Created by lion on 17-9-15.
  */
 public class CommonsTest {
+
+    @Rule
+
     @Test
     public void testSplitAndroidId() throws Exception {
         Assert.assertEquals("timepicker", Commons.splitAndroidId("@+id/timepicker"));
@@ -166,6 +172,13 @@ public class CommonsTest {
 
     @Test
     public void test168() throws Exception {
+        ConnectableObservable<String> replay = Observable.just("1", "2", "3", "4")
+                .replay();
 
+        replay.connect();
+        replay.reduce("", (s, s2) -> s + s2)
+                .toObservable()
+                .mergeWith(replay)
+                .subscribe(System.out::println);
     }
 }
