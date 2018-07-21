@@ -62,6 +62,9 @@ public class AutoRunFileChange {
             List<String> exclude = config.watcherExclude;
             for (String s : exclude) {
                 if (string.contains(s)) {
+                    if (config.debug) {
+                        System.out.println("refuse : because the file " + string + " contains " + s);
+                    }
                     return true;
                 }
             }
@@ -76,9 +79,12 @@ public class AutoRunFileChange {
                     if (fileName == null) {
                         throw new RuntimeException("can not read from " + config.watcherFile);
                     }
+                    if (config.debug) {
+                        System.out.println("read: " + fileName);
+                    }
                     for (String s : config.watcherFilter) {
                         if (fileName.contains(s) && !exclude(fileName)) {
-                            System.out.println("read: " + fileName);
+                            System.out.println("accept: " + fileName);
                             files.put(fileName);
                             break;
                         }
@@ -128,6 +134,7 @@ public class AutoRunFileChange {
         List<String> watcherFilter;
         List<String> watcherExclude;
         String command[];
+        Boolean debug;
 
         @Override
         public String toString() {
@@ -138,6 +145,7 @@ public class AutoRunFileChange {
                     ", watcherFilter=" + watcherFilter +
                     ", watcherExclude=" + watcherExclude +
                     ", command=" + Arrays.toString(command) +
+                    ", debug=" + debug +
                     '}';
         }
     }
@@ -150,6 +158,7 @@ public class AutoRunFileChange {
             String watcherFilterStr = System.getProperty("user.watcher.filter");
             String watcherScript = System.getProperty("user.watcher.script");
             String watcherExcludeStr = System.getProperty("user.watcher.exclude");
+            String watcherDebug = System.getProperty("user.watcher.debug");
 
             Objects.requireNonNull(userDirStr);
             Objects.requireNonNull(watcherFileStr);
@@ -166,6 +175,8 @@ public class AutoRunFileChange {
 
             this.watcherExclude = new ArrayList<>();
             watcherExclude.addAll(Arrays.asList(watcherExcludeStr.split(",")));
+
+            this.debug = !Strings.isEmpty(watcherDebug);
         }
     }
 
@@ -181,6 +192,7 @@ public class AutoRunFileChange {
             this.watcherTime = 3000L;
             FileGenerator.start(this);
             this.command = new String[]{"ls", "-l"};
+            this.debug = Boolean.valueOf(true);
         }
     }
 

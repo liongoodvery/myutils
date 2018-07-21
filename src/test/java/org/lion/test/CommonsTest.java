@@ -1,29 +1,40 @@
 package org.lion.test;
 
-import io.reactivex.Observable;
-import io.reactivex.observables.ConnectableObservable;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.lion.beans.Person;
 import org.lion.utils.Commons;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.jar.JarFile;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import io.reactivex.Observable;
+import io.reactivex.observables.ConnectableObservable;
 
 /**
  * Created by lion on 17-9-15.
  */
 public class CommonsTest {
-
-    @Rule
-
     @Test
     public void testSplitAndroidId() throws Exception {
         Assert.assertEquals("timepicker", Commons.splitAndroidId("@+id/timepicker"));
@@ -180,5 +191,28 @@ public class CommonsTest {
                 .toObservable()
                 .mergeWith(replay)
                 .subscribe(System.out::println);
+    }
+
+    @Test
+    public void test186() throws Exception {
+        JarFile jarFile = new JarFile("/home/lion/ram/lib/log4j-api-2.0-rc1.jar");
+        jarFile.stream().forEach(jarEntry -> {
+            String name = jarEntry.getName();
+            if (name.endsWith("pom.properties")) {
+                try {
+                    InputStream inputStream = jarFile.getInputStream(jarEntry);
+                    IOUtils.readLines(inputStream).stream().forEach(System.out::println);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
+
+    @Test
+    public void test215() throws Exception {
+
     }
 }
