@@ -4,21 +4,42 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import io.reactivex.Observable;
-import io.reactivex.observables.ConnectableObservable;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+
 import org.jsoup.Jsoup;
 import org.lion.beans.TypeName;
 import org.lion.utils.Strings;
 
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.lang.model.element.Modifier;
+
+import edu.yjyx.student.module.main.api.input.BaseInput;
+import io.reactivex.Observable;
+import io.reactivex.observables.ConnectableObservable;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 public class YjInputPaser {
     String docId = "";
+    public static final String METHOD_PUT = "PUT";
+    public static final String METHOD_GET = "GET";
+    public static final String METHOD_POST = "POST";
+    public static final String METHOD_HEAD = "HEAD";
+    public static final String METHOD_DELETE = "DELETE";
+    public static final String[] METHODS = new String[]{
+            METHOD_PUT,
+            METHOD_GET,
+            METHOD_POST,
+            METHOD_HEAD,
+            METHOD_DELETE,
+    };
+
+    Pattern pattern = Pattern.compile(".*/api/(.*)?( |`).*");
+
 
     public static void main(String[] args) {
         String docId = "";
@@ -40,9 +61,71 @@ public class YjInputPaser {
 
     public void run() {
 
-        ConnectableObservable<TypeName> replay = Observable.fromCallable(this::getMd)
+        ConnectableObservable<String> source = Observable.fromCallable(this::getMd)
                 .map(s -> s.split("\\n"))
                 .flatMap(Observable::fromArray)
+                .replay();
+        source.connect();
+
+        String action = parseInputFile(source);
+
+        parseRestful(source, action);
+
+    }
+
+    private void parseRestful(ConnectableObservable<String> source, String action) {
+        String url = source.skipWhile(s -> !(s.trim().equals("**请求URL：**")))
+                .takeUntil(s -> (s.trim().equals("**请求方式：**")))
+                .skip(1)
+                .take(1)
+                .map(this::restUrlMapper)
+                .blockingFirst();
+
+        String method = source.skipWhile(s -> !(s.trim().equals("**请求方式：**")))
+                .takeUntil(s -> (s.trim().equals("**参数：**")))
+                .skip(1)
+                .take(1)
+                .map(this::restMethodMapper)
+                .blockingFirst();
+
+        String methodName = Strings.underLineToCamel("", action);
+        String outClass = "BaseResponse";
+        if (method.equals(METHOD_GET) || method.equals(METHOD_HEAD)) {
+            System.out.println(String.format("@%s(\"%s\")", method, url));
+            System.out.println(String.format("NetworkObservable<%s> %s(@QueryMap Map<String, String> params);",
+                    outClass, methodName));
+        }
+
+        if (method.equals(METHOD_POST) || method.equals(METHOD_PUT)) {
+            System.out.println("@FormUrlEncoded");
+            System.out.println(String.format("@%s(\"%s\")", method, url));
+            System.out.println(String.format("NetworkObservable<%s> %s(@FieldMap Map<String, String> params);",
+                    outClass, methodName));
+        }
+    }
+
+    private String restUrlMapper(String s) {
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+
+        return "";
+    }
+
+    private String restMethodMapper(String s) {
+
+        String m = s.toUpperCase();
+        for (String method : METHODS) {
+            if (m.contains(method)) {
+                return method;
+            }
+        }
+        return "";
+    }
+
+    private String parseInputFile(ConnectableObservable<String> source) {
+        Observable<TypeName> replay = source
                 .skipWhile(s -> !(s.trim().equals("**参数：**")))
                 .takeUntil(s -> (s.trim().equals("**正常返回参数说明**")))
                 .skip(4)
@@ -59,10 +142,10 @@ public class YjInputPaser {
                         return new TypeName(typeName.getName(), typeName.getRequired(), typeName.getType(), typeName.getDefaultValue());
                     }
                     return typeName;
-                })
-                .replay();
+                });
 
-        replay.connect();
+
+//        source.connect();
 
         String action = replay.filter(this::isAction)
                 .map(TypeName::getDefaultValue)
@@ -80,7 +163,7 @@ public class YjInputPaser {
                 .map(stringBuilder -> stringBuilder.toString())
                 .toObservable()
                 .mergeWith(Observable.just("   }, new Object[]{"))
-                .reduce("", (s, s2) -> s + s2 )
+                .reduce("", (s, s2) -> s + s2)
                 .toObservable()
                 .mergeWith(replay.map(TypeName::getName))
                 .reduce((s, s2) -> s + s2 + "," + '\n')
@@ -94,7 +177,8 @@ public class YjInputPaser {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .build();
-        TypeSpec typeSpec = builder.addMethod(methodSpec).build();
+
+        TypeSpec typeSpec = builder.addMethod(methodSpec).superclass(BaseInput.class).build();
 
         JavaFile javaFile = JavaFile.builder("", typeSpec)
                 .build();
@@ -104,10 +188,14 @@ public class YjInputPaser {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return action;
     }
 
     private TypeSpec.Builder getTypeBuilder(String action) {
-        return TypeSpec.classBuilder("".equals(action) ? "TestInput" : Strings.capWord(action) + "Input")
+        String name = "".equals(action) ? "TestInput" : action + "Input";
+        name = Strings.underLineToCamel("", name);
+        name = Strings.capWord(name);
+        return TypeSpec.classBuilder(name)
                 .addModifiers(Modifier.PUBLIC);
     }
 
@@ -148,6 +236,7 @@ public class YjInputPaser {
     }
 
     private String getMd() throws IOException {
+        System.out.println("YjInputPaser.getMd");
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("http://192.168.1.113/index.php?s=/home/page/index/page_id/" + docId)

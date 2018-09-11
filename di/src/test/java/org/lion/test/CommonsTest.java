@@ -24,6 +24,8 @@ import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -213,6 +215,18 @@ public class CommonsTest {
 
     @Test
     public void test215() throws Exception {
+        String s = "- ` http://127.0.0.1:80/api/student/statistic/ `";
+        System.out.println(restUrlMapper(s));
+    }
 
+    Pattern pattern = Pattern.compile(".*/api/(.*)?( |`).*");
+
+    private String restUrlMapper(String s) {
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return "";
     }
 }
