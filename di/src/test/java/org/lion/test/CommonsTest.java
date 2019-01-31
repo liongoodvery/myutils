@@ -6,8 +6,10 @@ import org.junit.Test;
 import org.lion.beans.Person;
 import org.lion.utils.Commons;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -228,5 +230,11 @@ public class CommonsTest {
         }
 
         return "";
+    }
+
+    @Test
+    public void test233() throws Exception {
+        System.setOut(new PrintStream(new FileOutputStream("/tmp/abcd.log")));
+        System.out.println("abcdefg");
     }
 }

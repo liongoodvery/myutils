@@ -14,8 +14,46 @@ public class AndroidTagParserFactory {
         Activity, Fragment, Adapter, Dialog, COMMON
     }
 
-    public static AndroidTagParser getParse(TagType tagType, boolean userCommonParser) {
-        if (userCommonParser) {
+    public static class FileInfo {
+        TagType tagType;
+        boolean isButterKnife;
+        boolean userCommonParser;
+        boolean isApp;
+        public TagType getTagType() {
+            return tagType;
+        }
+
+        public void setTagType(TagType tagType) {
+            this.tagType = tagType;
+        }
+
+        public boolean isButterKnife() {
+            return isButterKnife;
+        }
+
+        public void setButterKnife(boolean butterKnife) {
+            isButterKnife = butterKnife;
+        }
+
+        public boolean isUserCommonParser() {
+            return userCommonParser;
+        }
+
+        public void setUserCommonParser(boolean userCommonParser) {
+            this.userCommonParser = userCommonParser;
+        }
+
+        public boolean isApp() {
+            return isApp;
+        }
+
+        public void setApp(boolean app) {
+            isApp = app;
+        }
+    }
+
+    public static AndroidTagParser getParse(TagType tagType, FileInfo fileInfo) {
+        if (fileInfo.userCommonParser) {
             return new CommonAndroidTagParser(tagType);
         }
         if (tagType == TagType.Fragment) {
@@ -164,3 +202,15 @@ class CommonAndroidTagParser extends AbsAndroidTagParser {
     }
 }
 
+class ButterKnifeAndroidTagParser extends AbsAndroidTagParser {
+
+    @Override
+    protected String getAssignment(AndroidTag androidTag) {
+        return "";
+    }
+
+    @Override
+    protected String getDeclaration(AndroidTag androidTag) {
+        return null;
+    }
+}

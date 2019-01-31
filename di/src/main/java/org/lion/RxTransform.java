@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,33 +24,14 @@ public class RxTransform {
     }
 
     private static void handle(Path path) {
+        HashMap<String, String> hashMap = new HashMap<>();
+//        hashMap.put("import edu.yjyx.student.utils.DebugUtil;", "import edu.yjyx.base.DebugUtil;");
+        hashMap.put("import edu.yjyx.student.module.main.PaymentManager;", "import edu.yjyx.payment.PaymentManager;");
         try {
             List<String> list = Files.readAllLines(path).stream()
                     .map(s -> {
-//                        if ("import rx.android.schedulers.AndroidSchedulers;".equals(s)) {
-//                            return "import io.reactivex.android.schedulers.AndroidSchedulers;";
-//                        }
-//
-//                        if ("import rx.schedulers.Schedulers;".equals(s)) {
-//                            return "import io.reactivex.schedulers.Schedulers;";
-//                        }
-//
-//                        if ("import rx.Observable;".equals(s)) {
-//                            return "import io.reactivex.Observable;";
-//                        }
-//                        if ("import rx.Subscriber;".equals(s)) {
-//                            return "import edu.yjyx.student.utils.Subscriber;";
-//                        }
-//                        if ("import edu.yjyx.library.model.StatusCode;".equals(s)) {
-//                            return "import edu.yjyx.main.model.StatusCode;";
-//                        }
-//                        if ("import rx.Observer;".equals(s)) {
-//                            return "import io.reactivex.Observer;";
-//                        }
-                        if (s.startsWith("public class") && s.contains("BaseActivityV2")) {
-                            return s.replace("BaseActivityV2", "BaseActivity");
-                        }
-                        return s;
+                        String value = hashMap.get(s);
+                        return value == null ? s : value;
                     }).collect(Collectors.toList());
             Files.write(path, list);
         } catch (IOException e) {

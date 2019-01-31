@@ -10,6 +10,8 @@
     <modules>
         <module>tools</module>
         <module>di</module>
+        <module>pdf</module>
+
     </modules>
     <packaging>pom</packaging>
 

@@ -40,6 +40,9 @@ public class AndroidLayoutPhaseID {
     }
 
     public void start(String fileName) {
+        String mainPath = findMainPath(fileName);
+        folder = Paths.get(mainPath, "res", "layout").toString();
+        AndroidTagParserFactory.FileInfo fileInfo = detectFileInfo(mainPath, fileName);
         boolean userCommonParser = "1".equals(System.getProperty("userCommonParser"));
         boolean isJava = false;
         TagType type = TagType.Activity;
@@ -65,7 +68,7 @@ public class AndroidLayoutPhaseID {
                 String file = fileNames.remove(0);
                 handleFile(reader, file);
             }
-            AndroidTagParser parse = AndroidTagParserFactory.getParse(type,userCommonParser);
+            AndroidTagParser parse = AndroidTagParserFactory.getParse(type, fileInfo);
 
             TagResult tagResult = parse.parse(androidTags);
             System.out.println();
@@ -90,6 +93,20 @@ public class AndroidLayoutPhaseID {
         } catch (DocumentException e) {
             e.printStackTrace();
         }
+    }
+
+    private String findMainPath(String fileName) {
+        Path path = Paths.get(fileName);
+        while (!"main".equals(path.getFileName().toString())) {
+            path = path.getParent();
+        }
+        return path.toString();
+    }
+
+    private AndroidTagParserFactory.FileInfo detectFileInfo(String mainPath, String fileName) {
+        Path path = Paths.get(mainPath, "..", "..", "build.gradle").normalize();
+        AndroidTagParserFactory.FileInfo fileInfo = new AndroidTagParserFactory.FileInfo();
+        return fileInfo;
     }
 
     private void handleFile(SAXReader reader, String file) throws DocumentException {

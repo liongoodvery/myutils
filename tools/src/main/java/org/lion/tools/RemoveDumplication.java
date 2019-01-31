@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,9 +22,9 @@ public class RemoveDumplication {
     }
 
     private static void run(String[] args) throws IOException {
-        Set<String> ret = new HashSet<>();
+        Set<String> ret = new LinkedHashSet<>();
         Set<String> exist = new HashSet<>();
-        Set<String> src = new HashSet<>();
+        Set<String> src = new LinkedHashSet<>();
         src.addAll(Files.readAllLines(Paths.get(args[0])));
         for (int i = 1; i < args.length; i++) {
             exist.addAll(Files.readAllLines(Paths.get(args[i])));

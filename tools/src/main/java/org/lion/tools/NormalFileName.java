@@ -19,7 +19,7 @@ public class NormalFileName {
     }
 
     private static void run() throws IOException {
-        Files.walkFileTree(Paths.get("/media/lion/sea/m"), new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(Paths.get("/media/lion/PLUS/2018-12-12"), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 String orig = file.toAbsolutePath().toString();

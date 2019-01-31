@@ -23,7 +23,7 @@ import io.reactivex.observables.ConnectableObservable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-public class YjInputPaser {
+public class YjInputParser {
     String docId = "";
     public static final String METHOD_PUT = "PUT";
     public static final String METHOD_GET = "GET";
@@ -38,7 +38,7 @@ public class YjInputPaser {
             METHOD_DELETE,
     };
 
-    Pattern pattern = Pattern.compile(".*/api/(.*)?( |`).*");
+    Pattern pattern = Pattern.compile(".*/api/([\\w|/]*)?( |`|\\?).*");
 
 
     public static void main(String[] args) {
@@ -51,11 +51,11 @@ public class YjInputPaser {
             docId = args[0];
         }
 
-        new YjInputPaser(docId).run();
+        new YjInputParser(docId).run();
 
     }
 
-    public YjInputPaser(String docId) {
+    public YjInputParser(String docId) {
         this.docId = docId;
     }
 
@@ -90,6 +90,7 @@ public class YjInputPaser {
 
         String methodName = Strings.underLineToCamel("", action);
         String outClass = "BaseResponse";
+        System.out.println("====================RestMethod====================");
         if (method.equals(METHOD_GET) || method.equals(METHOD_HEAD)) {
             System.out.println(String.format("@%s(\"%s\")", method, url));
             System.out.println(String.format("NetworkObservable<%s> %s(@QueryMap Map<String, String> params);",
@@ -236,7 +237,7 @@ public class YjInputPaser {
     }
 
     private String getMd() throws IOException {
-        System.out.println("YjInputPaser.getMd");
+//        System.out.println("YjInputParser.getMd");
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("http://192.168.1.113/index.php?s=/home/page/index/page_id/" + docId)
